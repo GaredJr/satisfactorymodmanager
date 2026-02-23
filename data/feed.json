@@ -1,0 +1,17 @@
+{
+  "updated_at": "2026-02-23T10:32:38+01:00",
+  "items": [
+    {
+      "title": "Internet",
+      "status": "ok",
+      "detail": "Online",
+      "ts": "2026-02-23T10:32:38+01:00"
+    },
+    {
+      "title": "Updater",
+      "status": "ok",
+      "detail": "Feed updated successfully",
+      "ts": "2026-02-23T10:32:38+01:00"
+    }
+  ]
+}
