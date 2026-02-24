@@ -1,16 +1,118 @@
-body { font-family: system-ui, sans-serif; margin: 0; background: #0b0f14; color: #e8eef7; }
-.wrap { max-width: 980px; margin: 0 auto; padding: 18px; }
-h1 { margin: 6px 0 16px; }
-.grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
-@media (min-width: 900px) { .grid { grid-template-columns: 1fr 1fr; } }
-.card { background: #111826; border: 1px solid #1a2436; border-radius: 14px; padding: 14px; }
-.row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1a2436; }
-.row:last-child { border-bottom: none; }
-.muted { color: #9fb0c7; font-size: 0.92rem; }
-.feed { margin-top: 10px; display: grid; gap: 10px; }
-.feed-item { padding: 10px; border-radius: 12px; border: 1px solid #1a2436; background: #0f1521; }
-.feed-item.ok { border-color: #1f3b2c; }
-.feed-item.warn { border-color: #3b331f; }
-.feed-item.bad { border-color: #3b1f1f; }
-.feed-title { font-weight: 700; margin-bottom: 4px; }
-.feed-detail { color: #cfe0f6; }
+@import url('https://fonts.googleapis.com/css2?family=Libertinus+Mono&family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
+
+:root {
+    --primary: #6b0c04;
+    --secondary: #aa7b4f;
+    --semi-sec: #cabfac;
+    --neutral: #e7e6e3;
+    --accent: #4a3b32;
+    --text: #33312e;
+
+}
+
+body {
+  font-family: "Libertinus Mono", monospace;
+  margin: 0;
+  background: var(--text);
+  color: var(--neutral);
+  line-height: 1.4;
+  font-size: 13.5px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px 18px 32px;
+}
+h1 {
+  font-family: "Libertinus Mono", monospace;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 1.05rem;
+  margin: 0 0 16px;
+  color: var(--neutral);
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.card {
+  background: var(--accent);
+  border-radius: 4px;
+  padding: 10px 12px;
+  border: 1px solid rgba(231, 230, 227, 0.14);
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(231, 230, 227, 0.12);
+  gap: 12px;
+}
+.row:last-child {
+  border-bottom: none;
+}
+.muted {
+  color: var(--semi-sec);
+  font-size: 0.82rem;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.feed {
+  margin-top: 10px;
+  display: grid;
+  gap: 6px;
+}
+.feed-item {
+  padding: 5px 8px;
+  border-radius: 3px;
+  background: rgba(231, 230, 227, 0.06);
+  color: var(--neutral);
+  border: 1px solid rgba(231, 230, 227, 0.12);
+}
+.feed-item.ok {
+  border-color: rgba(231, 230, 227, 0.5);
+}
+.feed-item.warn {
+  border-color: var(--secondary);
+}
+.feed-item.bad {
+  border-color: var(--primary);
+}
+.feed-title {
+  font-family: "Libertinus Mono", monospace;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+}
+.feed-detail {
+  color: var(--semi-sec);
+  font-size: 0.82rem;
+}
+
+.card h2,
+.card h3 {
+  font-family: "Libertinus Mono", monospace;
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  margin: 0 0 8px;
+}
+
+.row span:first-child {
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.82rem;
+}
