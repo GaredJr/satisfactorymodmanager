@@ -1,59 +1,145 @@
 <!doctype html>
 <html>
-<head>
-  <meta charset="utf-8" />
-  <meta http-equiv="refresh" content="8">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="/static/style.css">
-  <title>Pi Dashboard</title>
-</head>
-<body>
-  <div class="wrap">
-    <h1>Pi Dashboard</h1>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content="8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/style.css" />
+    <title>Pi Dashboard</title>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Pi Dashboard</h1>
 
-    <div class="grid">
-      <div class="card">
-        <h2>System</h2>
-        <div class="row"><span>CPU</span><span>{{ stats.cpu_percent }}%</span></div>
-        <div class="row"><span>RAM</span><span>{{ stats.ram_used_gb }} / {{ stats.ram_total_gb }} GB ({{ stats.ram_percent }}%)</span></div>
-        <div class="row"><span>Disk</span><span>{{ stats.disk_used_gb }} / {{ stats.disk_total_gb }} GB ({{ stats.disk_percent }}%)</span></div>
-        <div class="row"><span>Temp</span><span>{% if stats.temp_c is not none %}{{ stats.temp_c }}°C{% else %}n/a{% endif %}</span></div>
-        <div class="row"><span>Uptime</span><span>{{ stats.uptime_s }}s</span></div>
-        <div class="row"><span>IP</span><span>{{ stats.ip or "n/a" }}</span></div>
-      </div>
+      <div class="grid">
+        <div class="card">
+          <h2>System</h2>
+          <div class="row">
+            <span>CPU</span><span>{{ stats.cpu_percent }}%</span>
+          </div>
+          <div class="row">
+            <span>RAM</span
+            ><span
+              >{{ stats.ram_used_gb }} / {{ stats.ram_total_gb }} GB ({{
+              stats.ram_percent }}%)</span
+            >
+          </div>
+          <div class="row">
+            <span>Disk</span
+            ><span
+              >{{ stats.disk_used_gb }} / {{ stats.disk_total_gb }} GB ({{
+              stats.disk_percent }}%)</span
+            >
+          </div>
+          <div class="row">
+            <span>Temp</span
+            ><span
+              >{% if stats.temp_c is not none %}{{ stats.temp_c }}°C{% else
+              %}n/a{% endif %}</span
+            >
+          </div>
+          <div class="row">
+            <span>Uptime</span><span>{{ stats.uptime_s }}s</span>
+          </div>
+          <div class="row">
+            <span>IP</span><span>{{ stats.ip or "n/a" }}</span>
+          </div>
+        </div>
 
-      <div class="card">
-        <h2>Feed</h2>
-        <div class="muted">Last update: {{ feed["updated_at"] or "never" }}</div>
-        <div class="feed">
-          {% for item in feed["items"] %}
+        <div class="card">
+          <h2>Feed</h2>
+          <div class="muted">
+            Last update: {{ feed["updated_at"] or "never" }}
+          </div>
+          <div class="feed">
+            {% for item in feed["items"] %}
             <div class="feed-item {{ item.status }}">
               <div class="feed-title">{{ item.title }}</div>
               <div class="feed-detail">{{ item.detail }}</div>
-              {% if item.ts %}<div class="muted">{{ item.ts }}</div>{% endif %}
+              {% if item.ts %}
+              <div class="muted">{{ item.ts }}</div>
+              {% endif %}
             </div>
-          {% endfor %}
-          {% if feed["items"]|length == 0 %}
+            {% endfor %} {% if feed["items"]|length == 0 %}
             <div class="muted">No items yet. Run updater.</div>
-          {% endif %}
+            {% endif %}
+          </div>
         </div>
       </div>
+
+      <div class="card" style="margin-top: 10px">
+        <h2>GRAPHS</h2>
+        <div class="selectors">
+          <button class="active" data-metric="cpu">CPU</button>
+          <button data-metric="cpu">RAM</button>
+          <button data-metric="cpu">Disk</button>
+          <button data-metric="cpu">Temp</button>
+        </div>
+        <div class="graph-container">
+          <canvas id="statChart"></canvas>
+        </div>
+      </div>
+
+      <p class="muted">Auto refreshes every ~8 seconds.</p>
     </div>
+    <script>
+      let chart;
+      let currentMetric = "cpu";
 
-    <div class="card" style="margin-top:10px;">
-	    <h2>GRAPHS</h2>
-	    <div class="selectors">
-		<button class="active">CPU</button>
-		<button>RAM</button>
-		<button>Disk</button>
-		<button>Temp</button>
-	    </div>
-	    <div class="graph-container">
+      async function loadMetric(metric) {
+        currentMetric = metric;
+        const res = await fetch(`/api/stats?metric=${metric}&points=240`);
+        const data = await res.json();
+        if (!data.ok) return;
 
-	    </div>
-    </div>
+        const labels = data.points.map((p) =>
+          new Date(p.t * 1000).toLocaleTimeString(),
+        );
+        const values = data.points.map((p) => p.v);
 
-    <p class="muted">Auto refreshes every ~8 seconds.</p>
-  </div>
-</body>
+        const ctx = document.getElementById("statChart").getContext("2d");
+
+        const dsLabel = metric.toUpperCase();
+        if (!chart) {
+          chart = new Chart(ctx, {
+            type: "line",
+            data: {
+              labels,
+              datasets: [{ label: dsLabel, data: values, tension: 0.25 }],
+            },
+            options: {
+              animation: false,
+              responsive: true,
+              scales: { y: { beginAtZero: true } },
+            },
+          });
+        } else {
+          chart.data.labels = labels;
+          chart.data.datasets[0].label = dsLabel;
+          chart.data.datasets[0].data = values;
+          chart.update();
+        }
+      }
+
+      // call this when clicking tabs
+      function setActiveTab(metric) {
+        document.querySelectorAll("[data-metric]").forEach((el) => {
+          el.classList.toggle("active", el.dataset.metric === metric);
+        });
+        loadMetric(metric);
+      }
+
+      // refresh chart every 8s without reloading the whole page
+      setInterval(() => loadMetric(currentMetric), 8000);
+
+      // wire up tabs
+      document.querySelectorAll("[data-metric]").forEach((el) => {
+        el.addEventListener("click", () => setActiveTab(el.dataset.metric));
+      });
+
+      // initial
+      loadMetric("cpu");
+    </script>
+  </body>
 </html>
