@@ -1,23 +1,23 @@
 {
-  "updated_at": "2026-02-24T14:19:04+01:00",
+  "updated_at": "2026-02-25T09:59:04+01:00",
   "items": [
     {
       "title": "Git repo",
       "status": "warn",
       "detail": "dirty, ahead 0, behind 0",
-      "ts": "2026-02-24T14:19:03+01:00"
+      "ts": "2026-02-25T09:59:04+01:00"
     },
     {
       "title": "Weather (Oslo)",
       "status": "ok",
-      "detail": "1.2°C, wind 3.6 m/s, next 1h 0.0 mm, clearsky_day",
-      "ts": "2026-02-24T14:19:04+01:00"
+      "detail": "-0.9°C, wind 2.1 m/s, next 1h 0.0 mm, cloudy",
+      "ts": "2026-02-25T09:59:04+01:00"
     },
     {
       "title": "Updater",
       "status": "ok",
       "detail": "Feed updated successfully",
-      "ts": "2026-02-24T14:19:04+01:00"
+      "ts": "2026-02-25T09:59:04+01:00"
     }
   ]
 }
