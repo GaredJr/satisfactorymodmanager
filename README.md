@@ -14,3 +14,13 @@ Litt senere klarte jeg å få hosta en liten hardware monitor for raspberry pien
 <img src="./logg_media/nr2.png" width=500/>
 <img src="./logg_media/nr3.png" width=500/>
 
+## Tirsdag Feb 24 2026
+I dag jobbet jeg mest på det å få stylet siden, og startet på en graph viewer for hardware statsa.
+
+## Onsdag Feb 25 2026
+I dag startet jeg med å få siden opp igjennom domenet mitt på cloudflare.
+For dette brukte jeg cloudflare zero trust, og lagde en tunnel fra domenet med et subdomain til hosten (10.58.177.7:8000).
+[raspberry.hoyem.dev](https://raspberry.hoyem.dev/)
+<img src="./logg_media/nr4.png" width=500/>
+<img src="./logg_media/nr5.png" width=500/>
+
