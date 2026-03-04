@@ -1,6 +1,9 @@
 import json, os, subprocess
 from datetime import datetime, timezone
 from urllib.request import Request, urlopen
+import sqlite3, time
+import psutil
+import subprocess
 
 APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(APP_DIR, "data")
@@ -15,6 +18,40 @@ WEATHER_USER_AGENT = "pi-dashboard/1.0 gahoa005@osloskolen.no"
 
 OSLO_LAT = 59.91
 OSLO_LON = 10.75
+
+DB_FILE = os.path.join(DATA_DIR, "stats.sqlite")
+
+def get_temp_c():
+    try:
+        out = subprocess.check_output(["vcgencmd", "measure_temp"], text=True).strip()
+        return float(out.split("=")[1].split("'")[0])
+    except Exception:
+        return None
+
+def log_stats_point():
+    ts = int(time.time())
+    cpu = psutil.cpu_percent(interval=0.1)
+    ram = psutil.virtual_memory().percent
+    disk = psutil.disk_usage("/").percent
+    temp = get_temp_c()
+
+    con = sqlite3.connect(DB_FILE)
+    cur = con.cursor()
+    cur.execute("""
+      CREATE TABLE IF NOT EXISTS stats (
+        ts INTEGER PRIMARY KEY,
+        cpu REAL,
+        ram REAL,
+        disk REAL,
+        temp REAL
+      )
+    """)
+    cur.execute("INSERT OR REPLACE INTO stats(ts,cpu,ram,disk,temp) VALUES(?,?,?,?,?)",
+                (ts, cpu, ram, disk, temp))
+    # keep last ~7 days if you log every minute: 7*24*60 = 10080
+    cur.execute("DELETE FROM stats WHERE ts < ?", (ts - 7*24*60*60,))
+    con.commit()
+    con.close()
 
 def now_iso():
     return datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
@@ -119,6 +156,7 @@ def build_feed():
 
 def main():
     os.makedirs(DATA_DIR, exist_ok=True)
+    log_stats_point()
     feed = build_feed()
     tmp = DATA_FILE + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:

@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
 import psutil, time, json, os, socket, subprocess
+import sqlite3
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(APP_DIR, "data", "feed.json")
@@ -11,6 +12,27 @@ DATA_FILE = os.path.join(APP_DIR, "data", "feed.json")
 app = FastAPI()
 templates = Jinja2Templates(directory=os.path.join(APP_DIR, "templates"))
 app.mount("/static", StaticFiles(directory=os.path.join(APP_DIR, "static")), name="static")
+
+DB_FILE = os.path.join(APP_DIR, "data", "stats.sqlite")
+
+@app.get("/api/stats")
+def api_stats(metric: str = "cpu", points: int = 120):
+    if metric not in {"cpu", "ram", "disk", "temp"}:
+        return {"ok": False, "error": "bad metric"}
+
+    con = sqlite3.connect(DB_FILE)
+    cur = con.cursor()
+    cur.execute(f"SELECT ts, {metric} FROM stats ORDER BY ts DESC LIMIT ?", (points,))
+    rows = cur.fetchall()
+    con.close()
+
+    rows.reverse()  # oldest -> newest
+    return {
+        "ok": True,
+        "metric": metric,
+        "points": [{"t": ts, "v": val} for (ts, val) in rows if val is not None]
+    }
+
 
 def read_feed():
     try:
